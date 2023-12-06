@@ -74,6 +74,8 @@ int main()
 	initwindow(1000, 800);
 	setbkcolor(3);
 	cleardevice();
+	settextstyle(EUROPEAN_FONT, HORIZ_DIR, 5);
+	outtextxy(250, 700, "COLTUL NEGRU");
 	initTabla();
 	desTabla();
 	getch();
