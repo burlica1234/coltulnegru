@@ -11,7 +11,13 @@ int tabla[MAX][MAX];
 int n; 
 int PiesaAleasa;
 
-
+void afiseazaMeniul()
+{
+	readimagefile("1.jpg", 50, 25, 100, 75);
+	readimagefile("2.jpg", 150, 25, 200, 75);
+	readimagefile("3.jpg", 250, 25, 300, 75);
+	readimagefile("0.jpg", 350, 25, 400, 75);
+}
 void initTabla()
 {
 	n = 8;
@@ -76,6 +82,7 @@ int main()
 	cleardevice();
 	settextstyle(EUROPEAN_FONT, HORIZ_DIR, 5);
 	outtextxy(250, 700, "COLTUL NEGRU");
+	afiseazaMeniul();
 	initTabla();
 	desTabla();
 	getch();
