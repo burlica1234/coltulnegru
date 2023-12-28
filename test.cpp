@@ -16,19 +16,19 @@ int lv, cv, la, ca, ln, cn;
 
 void initTabla()
 {
-    n=3;
-    int i,j;
-    for (i=1; i<=n; i++)
-        for (j=1; j<=n; j++)
-            TablaDeJoc[i][j]=0;
-    TablaDeJoc[1][1]=3; // +
-    TablaDeJoc[1][0]=3;
+    n = 6;
+    int i, j;
+    for (i = 1; i <= n; i++)
+        for (j = 1; j <= n; j++)
+            TablaDeJoc[i][j] = 0;
+    TablaDeJoc[1][1] = 3; // +
+    TablaDeJoc[1][0] = 3;
     TablaDeJoc[n][n] = 4;
 
-    la=1;
-    ca=1;
-    lv=1;
-    cv=0;
+    la = 1;
+    ca = 1;
+    lv = 1;
+    cv = 0;
 }
 
 void desPiesa(int p, int l, int c)
@@ -37,99 +37,99 @@ void desPiesa(int p, int l, int c)
     switch (p)
     {
     case 0:
-        strcpy(numeFisier,"0.jpg");
+        strcpy(numeFisier, "0.jpg");
         break;
     case 1:
-        strcpy(numeFisier,"1.jpg");
+        strcpy(numeFisier, "1.jpg");
         break;
     case 2:
-        strcpy(numeFisier,"2.jpg");
+        strcpy(numeFisier, "2.jpg");
         break;
     case 3:
-        strcpy(numeFisier,"3.jpg");
+        strcpy(numeFisier, "3.jpg");
         break;
     case 4:
         strcpy(numeFisier, "4.jpg");
         break;
     }
-    readimagefile(numeFisier, 50*c, 100+50*l, 50*(c+1)-2,100+50*(l+1)-2);
+    readimagefile(numeFisier, 50 * c, 100 + 50 * l, 50 * (c + 1) - 2, 100 + 50 * (l + 1) - 2);
 }
 
 void desTabla()
 {
-    int i,j,p;
-    for (i=1; i<=n; i++)
+    int i, j, p;
+    for (i = 1; i <= n; i++)
     {
-        for (j=1; j<=n; j++)
+        for (j = 1; j <= n; j++)
         {
-            p=TablaDeJoc[i][j];
-            desPiesa(p,i,j);
+            p = TablaDeJoc[i][j];
+            desPiesa(p, i, j);
         }
     }
 }
 
-void alegePiesa(int &p)
+void alegePiesa(int& p)
 {
-    int x,y;
-    p=0;
-    if(ismouseclick(WM_LBUTTONDOWN))
+    int x, y;
+    p = 0;
+    if (ismouseclick(WM_LBUTTONDOWN))
     {
         clearmouseclick(WM_LBUTTONDOWN);
-        x=mousex();
-        y=mousey();
-        if (x>=50 && x<=100 && y>=25 && y<=75) p=1;
-        if (x>=150 && x<=200 && y>=25 && y<=75) p=2;
-        if (x>=250 && x<=300 && y>=25 && y<=75) p=3;
-        if (x>=350 && x<=400 && y>=25 && y<=75) p=4;
-        Beep(1000,200);
+        x = mousex();
+        y = mousey();
+        if (x >= 50 && x <= 100 && y >= 25 && y <= 75) p = 1;
+        if (x >= 150 && x <= 200 && y >= 25 && y <= 75) p = 2;
+        if (x >= 250 && x <= 300 && y >= 25 && y <= 75) p = 3;
+        if (x >= 350 && x <= 400 && y >= 25 && y <= 75) p = 4;
+        Beep(1000, 200);
     }
 }
 
 bool vinDinStanga()
 {
-    return lv==la && cv==ca-1;
+    return lv == la && cv == ca - 1;
 }
 
 bool vinDeSus()
 {
-    return lv==la-1 && cv==ca;
+    return lv == la - 1 && cv == ca;
 }
 
 bool vinDinDreapta()
 {
-    return lv==la && cv==ca+1;
+    return lv == la && cv == ca + 1;
 }
 
 bool vinDeJos()
 {
-    return lv==la+1 && cv==ca;
+    return lv == la + 1 && cv == ca;
 }
 
 void mergJos()
 {
-    cn=ca;
-    ln=la+1;
+    cn = ca;
+    ln = la + 1;
 
 }
 
 void mergSus()
 {
-    cn=ca;
-    ln=la-1;
+    cn = ca;
+    ln = la - 1;
 
 }
 
 void mergStanga()
 {
-    cn=ca-1;
-    ln=la;
+    cn = ca - 1;
+    ln = la;
 
 }
 
 void mergDreapta()
 {
-    cn=ca+1;
-    ln=la;
+    cn = ca + 1;
+    ln = la;
 
 }
 
@@ -138,23 +138,23 @@ void calculeazaLoculUndeTrebuiePusaPiesa()
     do
     {
 
-        switch(TablaDeJoc[la][ca])
+        switch (TablaDeJoc[la][ca])
         {
-        /* piesa 1 = \\ */
+            /* piesa 1 = \\ */
         case 1:
             if (vinDinStanga()) mergJos();
             else if (vinDinDreapta()) mergSus();
             else if (vinDeJos()) mergStanga();
             else mergDreapta();
             break;
-        /* piesa 2 = // */
+            /* piesa 2 = // */
         case 2:
             if (vinDinStanga()) mergSus();
             else if (vinDinDreapta()) mergJos();
             else if (vinDeJos()) mergDreapta();
             else mergStanga();
             break;
-        /* piesa 3 = + */
+            /* piesa 3 = + */
         case 3:
             if (vinDinStanga()) mergDreapta();
             else if (vinDinDreapta()) mergStanga();
@@ -166,69 +166,67 @@ void calculeazaLoculUndeTrebuiePusaPiesa()
             break;
 
         // cout<<"     lv="<<lv<<" cv="<<cv<<", la="<<la<<" ca="<<ca<<" -> ln="<<ln<<" cn="<<cn<<endl;
-        lv=la; cv=ca;
-        la=ln; ca=cn;
-    }
-    while (TablaDeJoc[ln][cn]!=0);
+        lv = la; cv = ca;
+        la = ln; ca = cn;
+    } while (TablaDeJoc[ln][cn] != 0);
 }
 
 bool punerePiesa()
 {
-    int linia,coloana,x,y;
-    int stanga=50, sus=150;
-    int dreapta=50+50*n, jos=150+50*n;
-    bool ok=false;
+    int linia, coloana, x, y;
+    int stanga = 50, sus = 150;
+    int dreapta = 50 + 50 * n, jos = 150 + 50 * n;
+    bool ok = false;
     bool alegere_corecta;
-    int lv1=lv, cv1=cv, la1=la, ca1=ca;
+    int lv1 = lv, cv1 = cv, la1 = la, ca1 = ca;
     do
     {
-        if ((cn >= n-1 && ln > n-1) || (cn > n-1 && ln >= n-1)) // verifica daca ai castigat 
+        if ((cn >= n - 1 && ln > n - 1) || (cn > n - 1 && ln >= n - 1)) // verifica daca ai castigat 
         {
-            calculeazaLoculUndeTrebuiePusaPiesa(); 
+            calculeazaLoculUndeTrebuiePusaPiesa();
             if (cn == n && ln == n)
             {
                 win = 1;
                 break;
             }
         }
-        alegere_corecta=false;
-        if(ismouseclick(WM_LBUTTONDOWN))
+        alegere_corecta = false;
+        if (ismouseclick(WM_LBUTTONDOWN))
         {
             clearmouseclick(WM_LBUTTONDOWN);
-            x=mousex();
-            y=mousey();
-            if (x>=stanga && x<=dreapta && y>=sus&&y<=jos)
+            x = mousex();
+            y = mousey();
+            if (x >= stanga && x <= dreapta && y >= sus && y <= jos)
             {
-                linia=(y-sus)/50+1;
-                coloana=(x-stanga)/50+1;
+                linia = (y - sus) / 50 + 1;
+                coloana = (x - stanga) / 50 + 1;
                 calculeazaLoculUndeTrebuiePusaPiesa(); // determina ln,cn
-                alegere_corecta=TablaDeJoc[linia][coloana]==0 && linia==ln && coloana==cn;
+                alegere_corecta = TablaDeJoc[linia][coloana] == 0 && linia == ln && coloana == cn;
                 // cout<<"lv="<<lv<<" cv="<<cv<<", la="<<la<<" ca="<<ca<<" -> ln="<<ln<<" cn="<<cn<<endl;
                 if (alegere_corecta)
                 {
-                    Beep(1500,200);
-                    TablaDeJoc[linia][coloana]=piesaAleasa;
-                    desPiesa(piesaAleasa,linia,coloana);
+                    Beep(1500, 200);
+                    TablaDeJoc[linia][coloana] = piesaAleasa;
+                    desPiesa(piesaAleasa, linia, coloana);
 
                 }
-                else 
+                else
                 {
-                    Beep(200,200);
-                    lv=lv1; cv=cv1; la=la1; ca=ca1;
+                    Beep(200, 200);
+                    lv = lv1; cv = cv1; la = la1; ca = ca1;
                 }
             }
         }
-    }
-    while (!alegere_corecta);
+    } while (!alegere_corecta);
     return ok;
 }
 
 void afiseazaMeniul()
 {
-    readimagefile("1.jpg",50,25,100,75);
-    readimagefile("2.jpg",150,25,200,75);
-    readimagefile("3.jpg",250,25,300,75);
-    readimagefile("0.jpg",350,25,400,75);
+    readimagefile("1.jpg", 50, 25, 100, 75);
+    readimagefile("2.jpg", 150, 25, 200, 75);
+    readimagefile("3.jpg", 250, 25, 300, 75);
+    readimagefile("0.jpg", 350, 25, 400, 75);
 }
 
 bool jocFinal()
@@ -239,9 +237,73 @@ bool jocFinal()
         return 0;
 }
 
+bool verificaButonMeniu(int left, int top, int right, int bottom) {
+    if (ismouseclick(WM_LBUTTONDOWN)) {
+        int x = mousex();
+        int y = mousey();
+        clearmouseclick(WM_LBUTTONDOWN);  
+
+        
+        if (x > left && x < right && y > top && y < bottom) {
+            return true;  
+        }
+    }
+    return false;  
+}
+void deseneazaMeniu() {
+    cleardevice(); 
+
+    
+    setbkcolor(COLOR(0, 100, 100)); 
+    cleardevice(); 
+
+    // culore meniu plus titlu
+    setcolor(WHITE);
+    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+    outtextxy(300, 200, "Coltul Negru");
+
+    // desenare buton 3d pt meniu
+    int btnLeft = 400, btnTop = 350, btnRight = 600, btnBottom = 400;
+    int depth = 5; // adancime buton 3d(cat de bine se vede paralelipipedul)
+    // stg si top 
+    setfillstyle(SOLID_FILL, DARKGRAY);
+    bar3d(btnLeft, btnTop, btnRight, btnBottom, depth, 1);
+
+    // fata butonului
+    setfillstyle(SOLID_FILL, LIGHTGRAY);
+    bar(btnLeft + depth, btnTop + depth, btnRight - depth, btnBottom - depth);
+
+    // scris buton 
+    setcolor(BLACK);
+    settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
+    outtextxy(btnLeft + depth + 50, btnTop + depth + 10, "Start Game");
+
+    // infrumusetare meniu,adaugare cercuri
+    setcolor(WHITE);
+    setlinestyle(SOLID_LINE, 0, THICK_WIDTH);
+    circle(100, 100, 50);
+    setfillstyle(SLASH_FILL, LIGHTBLUE);
+    floodfill(100, 100, WHITE);
+
+    // cerc dreapta jos
+    setcolor(WHITE);
+    circle(900, 700, 50);
+    setfillstyle(SLASH_FILL, LIGHTBLUE);
+    floodfill(900, 700, WHITE);
+
+    
+
+    while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom)) {
+        delay(100); 
+    }
+}
+
+
 int main()
 {
-    initwindow(1000,800);
+    initwindow(1000, 800); 
+    deseneazaMeniu();
+ 
     setbkcolor(3);
     cleardevice();
     settextstyle(EUROPEAN_FONT, HORIZ_DIR, 5);
@@ -256,21 +318,19 @@ int main()
     {
         i++;
         player = i % 2; // 2 jucatori: nr 1 si nr 0;
-        piesaAleasa=0;
+        piesaAleasa = 0;
         do
         {
             alegePiesa(piesaAleasa);
-            if (piesaAleasa==4)
+            if (piesaAleasa == 4)
             {
                 closegraph();
                 return 0;
             }
-        }
-        while (piesaAleasa==0);
+        } while (piesaAleasa == 0);
         punerePiesa();
-        
-    }
-    while (!win);
+
+    } while (!win);
     cout << "Player " << player << "win";
     cleardevice();
     if (player == 0)
