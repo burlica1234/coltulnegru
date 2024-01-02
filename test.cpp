@@ -8,15 +8,17 @@
 using namespace std;
 int player = 0;
 int win = 0;
+int margine = 0;
 int TablaDeJoc[MAX][MAX];
 // 1 +  2 \\ 3 //
 int n;
 int piesaAleasa;
 int lv, cv, la, ca, ln, cn;
-
+int lnV, cnV;
+int main();
 void initTabla()
 {
-    n = 6;
+    n = 8;
     int i, j;
     for (i = 1; i <= n; i++)
         for (j = 1; j <= n; j++)
@@ -171,6 +173,82 @@ void calculeazaLoculUndeTrebuiePusaPiesa()
     } while (TablaDeJoc[ln][cn] != 0);
 }
 
+void verificaJoc()
+{
+    switch (TablaDeJoc[la][ca])
+    {
+        /* piesa 1 = \\ */
+    case 1:
+        if (vinDinStanga())
+        {
+            cnV = ca;
+            lnV = la + 1;
+        }
+        else if (vinDinDreapta())
+        {
+            cnV = ca;
+            lnV = la - 1;
+        }
+        else if (vinDeJos())
+        {
+            cnV = ca - 1;
+            lnV = la;
+        }
+        else
+        {
+            cnV = ca + 1;
+            lnV = la;
+        }
+        break;
+        /* piesa 2 = // */
+    case 2:
+        if (vinDinStanga())
+        {
+            cnV = ca;
+            lnV = la - 1;
+        }
+        else if (vinDinDreapta())
+        {
+            cnV = ca;
+            lnV = la + 1;
+        }
+        else if (vinDeJos())
+        {
+            cnV = ca + 1;
+            lnV = la;
+        }
+        else
+        {
+            cnV = ca - 1;
+            lnV = la;
+        }
+        break;
+        /* piesa 3 = + */
+    case 3:
+        if (vinDinStanga())
+        {
+            cnV = ca + 1;
+            lnV = la;
+        }
+        else if (vinDinDreapta())
+        {
+            cnV = ca - 1;
+            lnV = la;
+        }
+        else if (vinDeJos())
+        {
+            cnV = ca;
+            lnV = la - 1;
+        }
+        else
+        {
+            cnV = ca;
+            lnV = la + 1;
+        }
+        break;
+    }
+}
+
 bool punerePiesa()
 {
     int linia, coloana, x, y;
@@ -181,15 +259,7 @@ bool punerePiesa()
     int lv1 = lv, cv1 = cv, la1 = la, ca1 = ca;
     do
     {
-        if ((cn >= n - 1 && ln > n - 1) || (cn > n - 1 && ln >= n - 1)) // verifica daca ai castigat 
-        {
-            calculeazaLoculUndeTrebuiePusaPiesa();
-            if (cn == n && ln == n)
-            {
-                win = 1;
-                break;
-            }
-        }
+
         alegere_corecta = false;
         if (ismouseclick(WM_LBUTTONDOWN))
         {
@@ -229,33 +299,60 @@ void afiseazaMeniul()
     readimagefile("0.jpg", 350, 25, 400, 75);
 }
 
-bool jocFinal()
+void jocFinal()
 {
-    if (TablaDeJoc[ln][cn] == 4)
-        return 1;
-    else
-        return 0;
+
+    if (cn == n || ln == n || cn == 1 || ln == 1)
+    {
+        verificaJoc();
+        if (cnV > n || cnV < 1 || lnV > n || lnV < 1) // verifica daca ai ajuns la margine 
+        {
+            margine = 1;
+            
+        }
+    }
+    if ((cn >= n - 1 && ln > n - 1) || (cn > n - 1 && ln >= n - 1)) // verifica daca ai castigat 
+    {
+        verificaJoc();
+        if (cnV == n && lnV == n)
+        {
+            win = 1;
+        }
+    }
 }
 
 bool verificaButonMeniu(int left, int top, int right, int bottom) {
     if (ismouseclick(WM_LBUTTONDOWN)) {
         int x = mousex();
         int y = mousey();
-        clearmouseclick(WM_LBUTTONDOWN);  
+        clearmouseclick(WM_LBUTTONDOWN);
 
-        
+
         if (x > left && x < right && y > top && y < bottom) {
-            return true;  
+            return true;
         }
     }
-    return false;  
+    return false;
+}
+bool ButonActivare(int left, int top, int right, int bottom) {
+    if (ismouseclick(WM_LBUTTONDOWN)) {
+        int x = mousex();
+        int y = mousey();
+        clearmouseclick(WM_LBUTTONDOWN);
+
+
+        if (x > left && x < right && y > top && y < bottom) {
+            return false;
+        }
+    }
+    return true;
 }
 void deseneazaMeniu() {
-    cleardevice(); 
+    cleardevice();
 
-    
-    setbkcolor(COLOR(0, 100, 100)); 
-    cleardevice(); 
+
+    setbkcolor(COLOR(0, 100, 100));
+    cleardevice();
 
     // culore meniu plus titlu
     setcolor(WHITE);
@@ -291,19 +388,71 @@ void deseneazaMeniu() {
     setfillstyle(SLASH_FILL, LIGHTBLUE);
     floodfill(900, 700, WHITE);
 
-    
+
 
     while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom)) {
-        delay(100); 
+        delay(100);
     }
 }
 
+void sfarsit()
+{
+    
+
+    if (margine)
+    {
+        setcolor(BLACK);
+        settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
+        outtextxy(400, 600, "Ai ajuns la margine! ");
+        if(player)
+            outtextxy(410, 700, "PLAYER 2 WIN");
+        else
+            outtextxy(410, 700, "PLAYER 1 WIN");
+
+    }
+    else
+    {
+        if (player)
+        {
+            setcolor(BLACK);
+            settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
+            outtextxy(410, 700, "PLAYER 1 WIN");
+        }
+        else
+        {
+            setcolor(BLACK);
+            settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
+            outtextxy(410, 700, "PLAYER 2 WIN");
+        }
+    }
+    // desenare buton 3d pt meniu
+    int btnLeft = 400, btnTop = 350, btnRight = 550, btnBottom = 400;
+    int depth = 5; // adancime buton 3d(cat de bine se vede paralelipipedul)
+    // stg si top 
+    setfillstyle(SOLID_FILL, DARKGRAY);
+    bar3d(btnLeft, btnTop, btnRight, btnBottom, depth, 1);
+
+    // fata butonului
+    setfillstyle(SOLID_FILL, LIGHTGRAY);
+    bar(btnLeft + depth, btnTop + depth, btnRight - depth, btnBottom - depth);
+
+    // scris buton 
+    setcolor(BLACK);
+    settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
+    outtextxy(btnLeft + depth + 50, btnTop + depth + 10, "Exit");
+
+    while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom)) {
+        delay(100);
+    }
+
+
+}
 
 int main()
 {
-    initwindow(1000, 800); 
+    initwindow(1000, 800);
     deseneazaMeniu();
- 
+
     setbkcolor(3);
     cleardevice();
     settextstyle(EUROPEAN_FONT, HORIZ_DIR, 5);
@@ -312,7 +461,7 @@ int main()
     initTabla();
     desTabla();
     int i = 0;
-    int continua;
+
 
     do
     {
@@ -328,23 +477,17 @@ int main()
                 return 0;
             }
         } while (piesaAleasa == 0);
+        
         punerePiesa();
+        jocFinal();
 
-    } while (!win);
-    cout << "Player " << player << "win";
+    } while (!win && !margine);
+    
     cleardevice();
-    if (player == 0)
-    {
-        outtextxy(250, 700, "PLAYER 0 WIN");
-    }
-    else
-        outtextxy(250, 700, "PLAYER 1 WIN");
-    outtextxy(0, 0, "PRESS LEFT TO RESTART");
-    outtextxy(0, 100, "PRESS any key TO QUIT");
-    char c;
-    c = (char)getch();
-    if (c == KEY_F1)
-        main();
+
+  
+    sfarsit();
+
     closegraph();
 
     return 0;
