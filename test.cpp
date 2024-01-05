@@ -15,6 +15,7 @@ int n;
 int piesaAleasa;
 int lv, cv, la, ca, ln, cn;
 int lnV, cnV;
+int depth = 5;
 int main();
 void initTabla()
 {
@@ -308,7 +309,7 @@ void jocFinal()
         if (cnV > n || cnV < 1 || lnV > n || lnV < 1) // verifica daca ai ajuns la margine 
         {
             margine = 1;
-            
+
         }
     }
     if ((cn >= n - 1 && ln > n - 1) || (cn > n - 1 && ln >= n - 1)) // verifica daca ai castigat 
@@ -347,6 +348,9 @@ bool ButonActivare(int left, int top, int right, int bottom) {
     }
     return true;
 }
+
+
+void showRules();
 void deseneazaMeniu() {
     cleardevice();
 
@@ -394,17 +398,49 @@ void deseneazaMeniu() {
         delay(100);
     }
 }
+void showRules() {
+   
+    cleardevice();
+    setbkcolor(COLOR(0, 100, 100));
+    cleardevice();
+    setcolor(WHITE);
+    settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
+    outtextxy(100, 50, "Reguli:");
 
+ 
+    outtextxy(100, 100, "1. Jocul incepe de la primul patrat al tablei, unde este deja plasata piesa in forma de cruce.");
+    outtextxy(100, 150, "2. Linia neagra nu trebuie sa ajunga la margine, in caz contrar, celalalt jucator castiga.");
+    outtextxy(100, 200, "3. Fiecare jucator are dreptul la cate o mutare, pe rand.");
+    outtextxy(100, 250, "4. Este strict interzisa folosirea inteligentei artificiale!");
+   
+
+    
+    int btnBackLeft = 400, btnBackTop = 700, btnBackRight = 600, btnBackBottom = 750;
+    setfillstyle(SOLID_FILL, DARKGRAY);
+    bar3d(btnBackLeft, btnBackTop, btnBackRight, btnBackBottom, depth, 1);
+    setfillstyle(SOLID_FILL, LIGHTGRAY);
+    bar(btnBackLeft + depth, btnBackTop + depth, btnBackRight - depth, btnBackBottom - depth);
+    setcolor(BLACK);
+    settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
+    outtextxy(btnBackLeft + depth + 70, btnBackTop + depth + 10, "Next");
+
+    
+    while (!verificaButonMeniu(btnBackLeft, btnBackTop, btnBackRight, btnBackBottom)) {
+        delay(100);
+    }
+
+  
+}
 void sfarsit()
 {
-    
+
 
     if (margine)
     {
         setcolor(BLACK);
         settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
         outtextxy(400, 600, "Ai ajuns la margine! ");
-        if(player)
+        if (player)
             outtextxy(410, 700, "PLAYER 2 WIN");
         else
             outtextxy(410, 700, "PLAYER 1 WIN");
@@ -452,14 +488,20 @@ int main()
 {
     initwindow(1000, 800);
     deseneazaMeniu();
-
+    showRules();
     setbkcolor(3);
+    
     cleardevice();
     settextstyle(EUROPEAN_FONT, HORIZ_DIR, 5);
     outtextxy(250, 700, "COLTUL NEGRU");
     afiseazaMeniul();
     initTabla();
     desTabla();
+    setcolor(WHITE);
+    circle(900, 700, 50);
+    setfillstyle(SLASH_FILL, LIGHTBLUE);
+    floodfill(900, 700, WHITE);
+  
     int i = 0;
 
 
@@ -477,15 +519,15 @@ int main()
                 return 0;
             }
         } while (piesaAleasa == 0);
-        
+
         punerePiesa();
         jocFinal();
 
     } while (!win && !margine);
-    
+
     cleardevice();
 
-  
+
     sfarsit();
 
     closegraph();
