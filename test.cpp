@@ -3,9 +3,21 @@
 #include <string.h>
 #include "graphics.h"
 
-#define MAX 20
-
+#include <fstream>
 using namespace std;
+ifstream fin("fis.txt");
+ifstream finn("fis_out.txt");
+ifstream re("fis_progres.txt");
+
+
+
+
+
+
+
+#define MAX 20
+int ver = 0;
+
 int player = 0;
 int win = 0;
 int margine = 0;
@@ -32,6 +44,55 @@ void initTabla()
     ca = 1;
     lv = 1;
     cv = 0;
+}
+
+void initTablaFisier()
+{
+    n = 8;
+
+    int camp;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+        {
+            fin >> camp;
+            TablaDeJoc[i][j] = camp;
+        }
+    la = 1;
+    ca = 1;
+    lv = 1;
+    cv = 0;
+}
+
+void initProgres()
+{
+    n = 8;
+    int camp;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+        {
+            finn >> camp;
+            TablaDeJoc[i][j] = camp;
+        }
+    finn >> la >> ca >> lv >> cv;
+    
+}
+
+void salvareProgres()
+{
+    ofstream fout("fis_out.txt", ios::trunc);
+    ofstream wr("fis_progres.txt", ios::trunc);
+    wr << ver << " ";
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= n; j++)
+        {
+            fout << TablaDeJoc[i][j] << " ";
+        }
+        fout << '\n';
+    }
+    fout << la << " " << ca << " " << lv << " " << cv<< "\n";
+    fout.close();
+    
 }
 
 void desPiesa(int p, int l, int c)
@@ -399,7 +460,7 @@ void deseneazaMeniu() {
     }
 }
 void showRules() {
-   
+
     cleardevice();
     setbkcolor(COLOR(0, 100, 100));
     cleardevice();
@@ -407,14 +468,14 @@ void showRules() {
     settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
     outtextxy(100, 50, "Reguli:");
 
- 
+
     outtextxy(100, 100, "1. Jocul incepe de la primul patrat al tablei, unde este deja plasata piesa in forma de cruce.");
     outtextxy(100, 150, "2. Linia neagra nu trebuie sa ajunga la margine, in caz contrar, celalalt jucator castiga.");
     outtextxy(100, 200, "3. Fiecare jucator are dreptul la cate o mutare, pe rand.");
     outtextxy(100, 250, "4. Este strict interzisa folosirea inteligentei artificiale!");
-   
 
-    
+
+
     int btnBackLeft = 400, btnBackTop = 700, btnBackRight = 600, btnBackBottom = 750;
     setfillstyle(SOLID_FILL, DARKGRAY);
     bar3d(btnBackLeft, btnBackTop, btnBackRight, btnBackBottom, depth, 1);
@@ -424,12 +485,12 @@ void showRules() {
     settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
     outtextxy(btnBackLeft + depth + 70, btnBackTop + depth + 10, "Next");
 
-    
+
     while (!verificaButonMeniu(btnBackLeft, btnBackTop, btnBackRight, btnBackBottom)) {
         delay(100);
     }
 
-  
+
 }
 void sfarsit()
 {
@@ -490,18 +551,25 @@ int main()
     deseneazaMeniu();
     showRules();
     setbkcolor(3);
-    
+
     cleardevice();
     settextstyle(EUROPEAN_FONT, HORIZ_DIR, 5);
     outtextxy(250, 700, "COLTUL NEGRU");
     afiseazaMeniul();
-    initTabla();
+    //initTabla();
+    re >> ver;
+    if (ver)
+    {
+        initProgres();
+    }
+    else
+        initTablaFisier();
     desTabla();
     setcolor(WHITE);
     circle(900, 700, 50);
     setfillstyle(SLASH_FILL, LIGHTBLUE);
     floodfill(900, 700, WHITE);
-  
+
     int i = 0;
 
 
@@ -515,6 +583,9 @@ int main()
             alegePiesa(piesaAleasa);
             if (piesaAleasa == 4)
             {
+                // salveaza progresul in fisier;
+                ver = 1;
+                salvareProgres();
                 closegraph();
                 return 0;
             }
@@ -529,7 +600,9 @@ int main()
 
 
     sfarsit();
-
+    ver = 0;
+    ofstream wr("fis_progres.txt", ios::trunc);
+    wr << ver << " ";
     closegraph();
 
     return 0;
