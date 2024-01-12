@@ -4,14 +4,16 @@
 #include <string.h>
 #include "graphics.h"
 #include <fstream>
+#include <ctime>
 using namespace std;
 ifstream fin("fis.txt");
 ifstream finn("fis_out.txt");
 ifstream re("fis_progres.txt");
 #define MAX_STATES 100
 #define MAX 100
+int i = 0;
 int ver = 0;
-
+int alegere = 1;
 int player = 0;
 int win = 0;
 int margine = 0;
@@ -121,7 +123,7 @@ void desPiesa(int p, int l, int c)
         break;
     }
     readimagefile(numeFisier, 50 * c, 100 + 50 * l, 50 * (c + 1) - 2, 100 + 50 * (l + 1) - 2);
-    
+
 }
 
 void desTabla()
@@ -330,7 +332,7 @@ void saveCurrentState() {
         gameStates[joccurent].lv = lv;
         gameStates[joccurent].cv = cv;
     }
-   
+
 }
 bool punerePiesa()
 {
@@ -541,7 +543,7 @@ void sfarsit()
         {
             setcolor(BLACK);
             settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
-            outtextxy(410, 700, "PLAYER 2 WIN");
+            outtextxy(410, 700, "PLAYER 2 / COMPUTER WIN");
         }
     }
     // desenare buton 3d pt meniu
@@ -600,14 +602,14 @@ void undoMove() {
         lv = gameStates[joccurent].lv;
         cv = gameStates[joccurent].cv;
         desPiesa(0, lr, cr);
-        
-        
-        
+
+
+
     }
-    
+
 }
 bool isInsideUndoButton(int x, int y) {
-    
+
     int left = 600, top = 350, right = 750, bottom = 400;
     return (x > left && x < right && y > top && y < bottom);
 }
@@ -622,13 +624,90 @@ void checkForUndoClick() {
         }
     }
 }
+
+void Calculator()
+{
+    int random;
+    srand((unsigned)time(NULL));
+    random = 1 + rand() % 3;
+    piesaAleasa = random;
+    calculeazaLoculUndeTrebuiePusaPiesa();
+    Beep(1500, 200);
+    int linia = ln;
+    int coloana = cn;
+    TablaDeJoc[linia][coloana] = piesaAleasa;
+    desPiesa(piesaAleasa, linia, coloana);
+    lr = linia;
+    cr = coloana;
+
+}
+
+void jocCalculator()
+{
+    int aFostPusaPiesa = 0;
+    do
+    {
+        i++;
+
+        player = i % 2; // 2 jucatori: nr 1 si nr 0;
+        piesaAleasa = 0;
+
+        if (player == 0 && aFostPusaPiesa)
+        {
+            Calculator();
+            aFostPusaPiesa = 0;
+        }
+        else
+        {
+            while (piesaAleasa != 1 && piesaAleasa != 2 && piesaAleasa != 3 && piesaAleasa != 4)
+                alegePiesa(piesaAleasa);
+        }
+
+
+        if (piesaAleasa == 4) {
+            // salveaza progresul in fisier;
+            ver = 1;
+            i--;
+            ofstream wr("fis_progres.txt", ios::trunc);
+            wr << ver << " " << alegere << " " << i;
+
+            salvareProgres();
+            saveCurrentState();
+            return;
+        }
+        else if (piesaAleasa == 5) {
+            undoMove();
+            saveCurrentState();
+
+            i--;
+        }
+        else if (piesaAleasa == 1 || piesaAleasa == 2 || piesaAleasa == 3) {
+            if (player)
+            {
+                punerePiesa();
+                aFostPusaPiesa = 1;
+            }
+            jocFinal();
+        }
+        else {
+            i--;
+        }
+
+
+
+
+    } while (!win && !margine);
+
+   
+}
+
+
 int main()
 {
     initwindow(1000, 800);
     deseneazaMeniu();
     showRules();
     setbkcolor(3);
-
     cleardevice();
     settextstyle(EUROPEAN_FONT, HORIZ_DIR, 5);
     outtextxy(250, 700, "COLTUL NEGRU");
@@ -648,51 +727,61 @@ int main()
     floodfill(900, 700, WHITE);
     drawUndoButton();
     checkForUndoClick();
-    int i = 0;
-
-
-    do
+    re >> alegere >> i;
+    //if (alegere != 1 && alegere != 2)
+        //input de la utilizator: 1 - joc in doi; 2 - joc calculator;
+    if (alegere == 1)
     {
-        i++;
-        player = i % 2; // 2 jucatori: nr 1 si nr 0;
-        piesaAleasa = 0;
+        do
+        {
+            i++;
 
-        alegePiesa(piesaAleasa);
+            player = i % 2; // 2 jucatori: nr 1 si nr 0;
+            piesaAleasa = 0;
+            alegePiesa(piesaAleasa);
 
-        if (piesaAleasa == 4) {
-            // salveaza progresul in fisier;
-            ver = 1;
-            salvareProgres();
-            saveCurrentState();
-            closegraph();
-            return 0;
-        }
-        else if (piesaAleasa == 5) {
-            undoMove();
-            saveCurrentState();
+            if (piesaAleasa == 4) {
+                // salveaza progresul in fisier;
+                ver = 1;
+                i--;
+                ofstream wr("fis_progres.txt", ios::trunc);
+                wr << ver << " " << alegere << " " << i;
 
-            i--;
-        }
-        else if (piesaAleasa == 1 || piesaAleasa == 2 || piesaAleasa == 3) {
-            punerePiesa();
-            jocFinal();
-        }
-        else {
-            i--;
-        }
+                salvareProgres();
+                saveCurrentState();
+                closegraph();
+                return 0;
+            }
+            else if (piesaAleasa == 5) {
+                undoMove();
+                saveCurrentState();
+
+                i--;
+            }
+            else if (piesaAleasa == 1 || piesaAleasa == 2 || piesaAleasa == 3) {
+                punerePiesa();
+                jocFinal();
+            }
+            else {
+                i--;
+            }
+
+        } while (!win && !margine);
+    }
+    else if(alegere == 2)
+    {
+        jocCalculator();
+    }
 
 
-
-    } while (!win && !margine);
 
     cleardevice();
-
-
     sfarsit();
     ver = 0;
+    alegere = -1;
+    i = 0;
     ofstream wr("fis_progres.txt", ios::trunc);
-    wr << ver << " ";
+    wr << ver << " " << alegere << " "<< i;
     closegraph();
-
     return 0;
 }
