@@ -662,6 +662,7 @@ int main()
         if (piesaAleasa == 4) {
             // salveaza progresul in fisier;
             ver = 1;
+            salvareProgres();
             saveCurrentState();
             closegraph();
             return 0;
