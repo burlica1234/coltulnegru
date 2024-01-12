@@ -1,21 +1,15 @@
+
 #include <iostream>
 #include "winbgim.h"
 #include <string.h>
 #include "graphics.h"
-
 #include <fstream>
 using namespace std;
 ifstream fin("fis.txt");
 ifstream finn("fis_out.txt");
 ifstream re("fis_progres.txt");
-
-
-
-
-
-
-
-#define MAX 20
+#define MAX_STATES 100
+#define MAX 100
 int ver = 0;
 
 int player = 0;
@@ -28,6 +22,16 @@ int piesaAleasa;
 int lv, cv, la, ca, ln, cn;
 int lnV, cnV;
 int depth = 5;
+struct GameState {
+    int TablaDeJoc[MAX][MAX];
+    int player;
+    int la, ca, lv, cv; // ultimele poz active/vizitate
+};
+int joccurent = -1;
+
+int lr, cr;
+
+GameState gameStates[MAX_STATES];
 int main();
 void initTabla()
 {
@@ -74,7 +78,7 @@ void initProgres()
             TablaDeJoc[i][j] = camp;
         }
     finn >> la >> ca >> lv >> cv;
-    
+
 }
 
 void salvareProgres()
@@ -90,9 +94,9 @@ void salvareProgres()
         }
         fout << '\n';
     }
-    fout << la << " " << ca << " " << lv << " " << cv<< "\n";
+    fout << la << " " << ca << " " << lv << " " << cv << "\n";
     fout.close();
-    
+
 }
 
 void desPiesa(int p, int l, int c)
@@ -117,6 +121,7 @@ void desPiesa(int p, int l, int c)
         break;
     }
     readimagefile(numeFisier, 50 * c, 100 + 50 * l, 50 * (c + 1) - 2, 100 + 50 * (l + 1) - 2);
+    
 }
 
 void desTabla()
@@ -145,6 +150,7 @@ void alegePiesa(int& p)
         if (x >= 150 && x <= 200 && y >= 25 && y <= 75) p = 2;
         if (x >= 250 && x <= 300 && y >= 25 && y <= 75) p = 3;
         if (x >= 350 && x <= 400 && y >= 25 && y <= 75) p = 4;
+        if (x >= 600 && x <= 750 && y >= 350 && y <= 400)p = 5;
         Beep(1000, 200);
     }
 }
@@ -310,9 +316,25 @@ void verificaJoc()
         break;
     }
 }
-
+void saveCurrentState() {
+    if (joccurent < MAX_STATES - 1) {
+        joccurent++;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                gameStates[joccurent].TablaDeJoc[i][j] = TablaDeJoc[i][j];
+            }
+        }
+        gameStates[joccurent].player = player;
+        gameStates[joccurent].la = la;
+        gameStates[joccurent].ca = ca;
+        gameStates[joccurent].lv = lv;
+        gameStates[joccurent].cv = cv;
+    }
+   
+}
 bool punerePiesa()
 {
+    saveCurrentState();
     int linia, coloana, x, y;
     int stanga = 50, sus = 150;
     int dreapta = 50 + 50 * n, jos = 150 + 50 * n;
@@ -340,7 +362,8 @@ bool punerePiesa()
                     Beep(1500, 200);
                     TablaDeJoc[linia][coloana] = piesaAleasa;
                     desPiesa(piesaAleasa, linia, coloana);
-
+                    lr = linia;
+                    cr = coloana;
                 }
                 else
                 {
@@ -411,7 +434,6 @@ bool ButonActivare(int left, int top, int right, int bottom) {
 }
 
 
-void showRules();
 void deseneazaMeniu() {
     cleardevice();
 
@@ -544,7 +566,62 @@ void sfarsit()
 
 
 }
+void drawUndoButton() {
+    // desenare buton 3d pt meniu
+    int btnLeft = 600, btnTop = 350, btnRight = 750, btnBottom = 400;
+    int depth = 5; // adancime buton 3d(cat de bine se vede paralelipipedul)
+    // stg si top 
+    setfillstyle(SOLID_FILL, DARKGRAY);
+    bar3d(btnLeft, btnTop, btnRight, btnBottom, depth, 1);
 
+    // fata butonului
+    setfillstyle(SOLID_FILL, LIGHTGRAY);
+    bar(btnLeft + depth, btnTop + depth, btnRight - depth, btnBottom - depth);
+
+    // scris buton 
+    setcolor(BLACK);
+    settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
+    outtextxy(btnLeft + depth + 50, btnTop + depth + 10, "Undo");
+}
+
+
+void undoMove() {
+    saveCurrentState();
+    if (joccurent > 0) {
+        joccurent--;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                TablaDeJoc[i][j] = gameStates[joccurent].TablaDeJoc[i][j];
+            }
+        }
+        player = gameStates[joccurent].player;
+        la = gameStates[joccurent].la;
+        ca = gameStates[joccurent].ca;
+        lv = gameStates[joccurent].lv;
+        cv = gameStates[joccurent].cv;
+        desPiesa(0, lr, cr);
+        
+        
+        
+    }
+    
+}
+bool isInsideUndoButton(int x, int y) {
+    
+    int left = 600, top = 350, right = 750, bottom = 400;
+    return (x > left && x < right && y > top && y < bottom);
+}
+
+void checkForUndoClick() {
+    if (ismouseclick(WM_LBUTTONDOWN)) {
+        int x = mousex();
+        int y = mousey();
+        clearmouseclick(WM_LBUTTONDOWN);
+        if (isInsideUndoButton(x, y)) {
+            undoMove();
+        }
+    }
+}
 int main()
 {
     initwindow(1000, 800);
@@ -569,7 +646,8 @@ int main()
     circle(900, 700, 50);
     setfillstyle(SLASH_FILL, LIGHTBLUE);
     floodfill(900, 700, WHITE);
-
+    drawUndoButton();
+    checkForUndoClick();
     int i = 0;
 
 
@@ -578,21 +656,31 @@ int main()
         i++;
         player = i % 2; // 2 jucatori: nr 1 si nr 0;
         piesaAleasa = 0;
-        do
-        {
-            alegePiesa(piesaAleasa);
-            if (piesaAleasa == 4)
-            {
-                // salveaza progresul in fisier;
-                ver = 1;
-                salvareProgres();
-                closegraph();
-                return 0;
-            }
-        } while (piesaAleasa == 0);
 
-        punerePiesa();
-        jocFinal();
+        alegePiesa(piesaAleasa);
+
+        if (piesaAleasa == 4) {
+            // salveaza progresul in fisier;
+            ver = 1;
+            saveCurrentState();
+            closegraph();
+            return 0;
+        }
+        else if (piesaAleasa == 5) {
+            undoMove();
+            saveCurrentState();
+
+            i--;
+        }
+        else if (piesaAleasa == 1 || piesaAleasa == 2 || piesaAleasa == 3) {
+            punerePiesa();
+            jocFinal();
+        }
+        else {
+            i--;
+        }
+
+
 
     } while (!win && !margine);
 
