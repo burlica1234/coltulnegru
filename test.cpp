@@ -1,4 +1,4 @@
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include "winbgim.h"
 #include <string.h>
@@ -408,7 +408,8 @@ void jocFinal()
     }
 }
 
-bool verificaButonMeniu(int left, int top, int right, int bottom) {
+bool verificaButonMeniu(int left, int top, int right, int bottom,int &ref) {
+
     if (ismouseclick(WM_LBUTTONDOWN)) {
         int x = mousex();
         int y = mousey();
@@ -416,24 +417,28 @@ bool verificaButonMeniu(int left, int top, int right, int bottom) {
 
 
         if (x > left && x < right && y > top && y < bottom) {
+            ref = 1;
             return true;
         }
     }
     return false;
 }
-bool ButonActivare(int left, int top, int right, int bottom) {
+bool verificaButonMeniu2(int left, int top, int right, int bottom, int& ref) {
+
     if (ismouseclick(WM_LBUTTONDOWN)) {
         int x = mousex();
         int y = mousey();
-        clearmouseclick(WM_LBUTTONDOWN);
+        
 
 
         if (x > left && x < right && y > top && y < bottom) {
-            return false;
+            ref = 1;
+            return true;
         }
     }
-    return true;
+    return false;
 }
+
 
 
 void deseneazaMeniu() {
@@ -477,11 +482,14 @@ void deseneazaMeniu() {
     setfillstyle(SLASH_FILL, LIGHTBLUE);
     floodfill(900, 700, WHITE);
 
-
-
-    while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom)) {
-        delay(100);
-    }
+    
+    int ref1 = 0;
+    
+   
+        while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom,ref1)) {
+            delay(100);
+        }
+       
 }
 void showRules() {
 
@@ -500,20 +508,41 @@ void showRules() {
 
 
 
-    int btnBackLeft = 400, btnBackTop = 700, btnBackRight = 600, btnBackBottom = 750;
+    int btnBackLeft = 200, btnBackTop = 700, btnBackRight = 400, btnBackBottom = 750;
     setfillstyle(SOLID_FILL, DARKGRAY);
     bar3d(btnBackLeft, btnBackTop, btnBackRight, btnBackBottom, depth, 1);
     setfillstyle(SOLID_FILL, LIGHTGRAY);
     bar(btnBackLeft + depth, btnBackTop + depth, btnBackRight - depth, btnBackBottom - depth);
     setcolor(BLACK);
     settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
-    outtextxy(btnBackLeft + depth + 70, btnBackTop + depth + 10, "Next");
+    outtextxy(btnBackLeft + depth + 18, btnBackTop + depth + 10, "Play against a friend");
+
+    int btnBackLeft2 = 600, btnBackTop2 = 700, btnBackRight2 = 800, btnBackBottom2 = 750;
+    setfillstyle(SOLID_FILL, DARKGRAY);
+    bar3d(btnBackLeft2, btnBackTop2, btnBackRight2, btnBackBottom2, depth, 1);
+    setfillstyle(SOLID_FILL, LIGHTGRAY);
+    bar(btnBackLeft2 + depth, btnBackTop2 + depth, btnBackRight2 - depth, btnBackBottom2 - depth);
+    setcolor(BLACK);
+    settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
+    outtextxy(btnBackLeft2 + depth + 6, btnBackTop2 + depth + 10, "Play against computer");
 
 
-    while (!verificaButonMeniu(btnBackLeft, btnBackTop, btnBackRight, btnBackBottom)) {
+    int alg1 = 0;
+    int alg2 = 0;
+    
+    while (true) {
+        
+        if (verificaButonMeniu2(btnBackLeft2, btnBackTop2, btnBackRight2, btnBackBottom2, alg2)) { clearmouseclick(WM_LBUTTONDOWN); break; }
+        if (verificaButonMeniu2(btnBackLeft, btnBackTop, btnBackRight, btnBackBottom, alg1)) { clearmouseclick(WM_LBUTTONDOWN); break;  }
+            clearmouseclick(WM_LBUTTONDOWN);
         delay(100);
     }
-
+    if (alg1)
+        alegere = 1;
+    if (alg2)
+        alegere = 2;
+    //cleardevice();
+    //deseneazaMeniu();
 
 }
 void sfarsit()
@@ -562,7 +591,9 @@ void sfarsit()
     settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 2);
     outtextxy(btnLeft + depth + 50, btnTop + depth + 10, "Exit");
 
-    while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom)) {
+    int asas = 0;
+
+    while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom,asas)) {
         delay(100);
     }
 
@@ -637,19 +668,20 @@ void Calculator()
     int coloana = cn;
     TablaDeJoc[linia][coloana] = piesaAleasa;
     desPiesa(piesaAleasa, linia, coloana);
-    lr = linia;
-    cr = coloana;
+   
 
 }
 
 void jocCalculator()
 {
     int aFostPusaPiesa = 0;
+    
     do
     {
         i++;
-
+        
         player = i % 2; // 2 jucatori: nr 1 si nr 0;
+        
         piesaAleasa = 0;
 
         if (player == 0 && aFostPusaPiesa)
@@ -698,7 +730,7 @@ void jocCalculator()
 
     } while (!win && !margine);
 
-   
+
 }
 
 
@@ -727,9 +759,10 @@ int main()
     floodfill(900, 700, WHITE);
     drawUndoButton();
     checkForUndoClick();
-    re >> alegere >> i;
+    //re >> alegere >> i;
     //if (alegere != 1 && alegere != 2)
         //input de la utilizator: 1 - joc in doi; 2 - joc calculator;
+    //alegere = 2;
     if (alegere == 1)
     {
         do
@@ -768,11 +801,11 @@ int main()
 
         } while (!win && !margine);
     }
-    else if(alegere == 2)
+    else if (alegere == 2)
     {
         jocCalculator();
     }
-
+    
 
 
     cleardevice();
@@ -781,7 +814,7 @@ int main()
     alegere = -1;
     i = 0;
     ofstream wr("fis_progres.txt", ios::trunc);
-    wr << ver << " " << alegere << " "<< i;
+    wr << ver << " " << alegere << " " << i;
     closegraph();
     return 0;
 }
