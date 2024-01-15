@@ -408,7 +408,7 @@ void jocFinal()
     }
 }
 
-bool verificaButonMeniu(int left, int top, int right, int bottom,int &ref) {
+bool verificaButonMeniu(int left, int top, int right, int bottom, int& ref) {
 
     if (ismouseclick(WM_LBUTTONDOWN)) {
         int x = mousex();
@@ -428,7 +428,7 @@ bool verificaButonMeniu2(int left, int top, int right, int bottom, int& ref) {
     if (ismouseclick(WM_LBUTTONDOWN)) {
         int x = mousex();
         int y = mousey();
-        
+
 
 
         if (x > left && x < right && y > top && y < bottom) {
@@ -482,14 +482,14 @@ void deseneazaMeniu() {
     setfillstyle(SLASH_FILL, LIGHTBLUE);
     floodfill(900, 700, WHITE);
 
-    
+
     int ref1 = 0;
-    
-   
-        while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom,ref1)) {
-            delay(100);
-        }
-       
+
+
+    while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom, ref1)) {
+        delay(100);
+    }
+
 }
 void showRules() {
 
@@ -529,12 +529,12 @@ void showRules() {
 
     int alg1 = 0;
     int alg2 = 0;
-    
+
     while (true) {
-        
+
         if (verificaButonMeniu2(btnBackLeft2, btnBackTop2, btnBackRight2, btnBackBottom2, alg2)) { clearmouseclick(WM_LBUTTONDOWN); break; }
-        if (verificaButonMeniu2(btnBackLeft, btnBackTop, btnBackRight, btnBackBottom, alg1)) { clearmouseclick(WM_LBUTTONDOWN); break;  }
-            clearmouseclick(WM_LBUTTONDOWN);
+        if (verificaButonMeniu2(btnBackLeft, btnBackTop, btnBackRight, btnBackBottom, alg1)) { clearmouseclick(WM_LBUTTONDOWN); break; }
+        clearmouseclick(WM_LBUTTONDOWN);
         delay(100);
     }
     if (alg1)
@@ -593,7 +593,7 @@ void sfarsit()
 
     int asas = 0;
 
-    while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom,asas)) {
+    while (!verificaButonMeniu(btnLeft, btnTop, btnRight, btnBottom, asas)) {
         delay(100);
     }
 
@@ -668,20 +668,20 @@ void Calculator()
     int coloana = cn;
     TablaDeJoc[linia][coloana] = piesaAleasa;
     desPiesa(piesaAleasa, linia, coloana);
-   
+
 
 }
 
 void jocCalculator()
 {
     int aFostPusaPiesa = 0;
-    
+
     do
     {
         i++;
-        
+
         player = i % 2; // 2 jucatori: nr 1 si nr 0;
-        
+
         piesaAleasa = 0;
 
         if (player == 0 && aFostPusaPiesa)
@@ -738,14 +738,17 @@ int main()
 {
     initwindow(1000, 800);
     deseneazaMeniu();
-    showRules();
+    re >> ver;
+    re >> alegere >> i;
+    if (alegere != 1 && alegere != 2)
+        showRules();
     setbkcolor(3);
     cleardevice();
     settextstyle(EUROPEAN_FONT, HORIZ_DIR, 5);
     outtextxy(250, 700, "COLTUL NEGRU");
     afiseazaMeniul();
     //initTabla();
-    re >> ver;
+
     if (ver)
     {
         initProgres();
@@ -759,9 +762,8 @@ int main()
     floodfill(900, 700, WHITE);
     drawUndoButton();
     checkForUndoClick();
-    //re >> alegere >> i;
-    //if (alegere != 1 && alegere != 2)
-        //input de la utilizator: 1 - joc in doi; 2 - joc calculator;
+
+
     //alegere = 2;
     if (alegere == 1)
     {
@@ -799,13 +801,16 @@ int main()
                 i--;
             }
 
+
         } while (!win && !margine);
     }
     else if (alegere == 2)
     {
         jocCalculator();
+        if (piesaAleasa == 4)
+            return 0;
     }
-    
+
 
 
     cleardevice();
